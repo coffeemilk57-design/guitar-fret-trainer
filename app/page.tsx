@@ -437,50 +437,43 @@ export default function Home() {
   };
 
   return (
-    <div className="page-shell">
+    <div className="page-shell overflow-x-hidden">
       <main className="content">
-        <section className="hero-card">
-          <div>
-            <p className="eyebrow">ギター指板の音名クイズ</p>
-            <h1>6弦レギュラーチューニング / 0〜12フレット</h1>
-            <p>
-              表示された指板をタップして、表示された音名を探しましょう。タップ時に音が鳴り、5秒以内に答えを選んでください。
-            </p>
+        <section className="status-row">
+          <div className={`status-item ${questionToneClass} ${status === "playing" ? "animate-pulse" : ""}`}>
+            <span>問題</span>
+            <strong>{targetName}</strong>
           </div>
-          <div className="status-card">
-            <div className={`status-item ${questionToneClass} ${status === "playing" ? "animate-pulse" : ""}`}>
-              <span>問題</span>
-              <strong>{targetName}</strong>
-            </div>
-            <div className="status-item">
-              <span>残り時間</span>
-              <strong>{timeLeft}s</strong>
-            </div>
-            <div className="status-item">
-              <span>スコア</span>
-              <strong>{score}</strong>
-              <div className="accuracy">正解率：{((correctCount + wrongCount) === 0 ? 0 : ((correctCount / (correctCount + wrongCount)) * 100)).toFixed(1)}%</div>
-            </div>
-            <div className="status-item">
-              <span>ラウンド</span>
-              <strong>{round}</strong>
-            </div>
+          <div className="status-item">
+            <span>残り時間</span>
+            <strong>{timeLeft}s</strong>
           </div>
+          <div className="status-item">
+            <span>スコア</span>
+            <strong>{score}</strong>
+          </div>
+          <div className="status-item">
+            <span>ラウンド</span>
+            <strong>{round}</strong>
+          </div>
+        </section>
+
+        <section className="control-row">
           <div className="string-selector">
-            {stringButtonOrder.map((index, display) => (
+            {stringButtonOrder.map((index) => (
               <button
                 key={index}
                 type="button"
                 className={`string-toggle ${selectedStrings.includes(index) ? "active" : ""}`}
                 onClick={() => toggleStringSelection(index)}
               >
-                {6 - index}弦
+                {6 - index}
               </button>
             ))}
           </div>
-          <div className="button-row">
+          <div className="control-actions">
             <button className="primary-button" onClick={handleStart}>
-              {status === "idle" || status === "stopped" ? "クイズを始める" : "リスタート"}
+              {status === "idle" || status === "stopped" ? "開始" : "再開"}
             </button>
             <button className="secondary-button" onClick={toggleBgm} type="button">
               {bgmOn ? "BGM OFF" : "BGM ON"}
@@ -490,7 +483,11 @@ export default function Home() {
             </button>
           </div>
           <div className="volume-controls">
-            <span className="volume-label">BGM音量</span>
+            <div className="accuracy-small">
+              <span>正解率</span>
+              <strong>{((correctCount + wrongCount) === 0 ? 0 : ((correctCount / (correctCount + wrongCount)) * 100)).toFixed(1)}%</strong>
+            </div>
+            <span className="volume-label">音量</span>
             <div className="volume-buttons">
               {[1, 2, 3, 4, 5].map((level) => (
                 <button
@@ -505,10 +502,10 @@ export default function Home() {
             </div>
           </div>
           <div className="feedback-bar">
-            {status === "correct" && <span className="correct">正解！</span>}
-            {status === "wrong" && <span className="wrong">違います…</span>}
-            {status === "timeout" && <span className="timeout">時間切れです！</span>}
-            {status === "stopped" && <span className="timeout">停止中</span>}
+            {status === "correct" && <span className="correct">正解</span>}
+            {status === "wrong" && <span className="wrong">違います</span>}
+            {status === "timeout" && <span className="timeout">時間切れ</span>}
+            {status === "stopped" && <span className="timeout">停止</span>}
           </div>
         </section>
 
@@ -567,98 +564,147 @@ export default function Home() {
                     })}
                   </div>
                 ))}
+              <div className="nut-line" aria-hidden="true" />
             </div>
           </div>
         </section>
       </main>
 
+      <div className="portrait-warning">
+        <div>
+          <p>縦向き表示ではご利用いただけません。</p>
+          <p>横向きに回転してお楽しみください。</p>
+        </div>
+      </div>
+
       <style jsx>{`
         .page-shell {
           min-height: 100vh;
+          height: 100vh;
+          box-sizing: border-box;
           background: #2f1e0f;
           color: #f8fafc;
           display: flex;
           justify-content: center;
-          padding: 24px 16px;
+          padding: 8px 6px;
+          width: 100vw;
+          max-width: 100vw;
+          overflow-x: hidden;
           background-image: radial-gradient(circle at top, rgba(255, 255, 255, 0.08), transparent 28%), linear-gradient(180deg, #4e2f13 0%, #2f1e0f 45%, #1d1208 100%);
         }
 
         .content {
-          width: min(1200px, 100%);
           display: grid;
-          gap: 20px;
+          grid-template-rows: minmax(22px, auto) minmax(26px, auto) 1fr;
+          gap: 4px;
+          width: 100%;
+          height: 100%;
+          overflow: hidden;
         }
 
-        .hero-card,
+        :global(html), :global(body) {
+          width: 100%;
+          height: 100%;
+          margin: 0;
+          overflow-x: hidden;
+        }
+
+        main {
+          overflow-x: hidden;
+        }
+
+        .status-row,
+        .control-row,
         .fretboard-card {
-          border-radius: 24px;
-          padding: 20px;
-          box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+          border-radius: 18px;
+          padding: 2px 3px;
+          box-shadow: 0 10px 18px rgba(0, 0, 0, 0.18);
+          overflow: hidden;
         }
 
-        .hero-card {
-          background: rgba(22, 10, 5, 0.88);
+        .status-row,
+        .control-row {
+          background: rgba(22, 10, 5, 0.92);
           border: 1px solid rgba(255, 255, 255, 0.08);
         }
 
         .fretboard-card {
           background: linear-gradient(180deg, #6b4428 0%, #4b2c18 48%, #3b2314 100%);
           border: 1px solid rgba(255, 255, 255, 0.08);
-          overflow-x: auto;
+          overflow: hidden;
+          min-height: 210px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 14px 16px 16px 24px;
+          margin-top: 4px;
         }
 
         .fretboard-shell {
-          min-width: 900px;
+          --label-width: 80px;
+          min-width: auto;
+          width: auto;
+          max-width: 100%;
+          min-height: 200px;
+          margin: 0 auto;
           background: linear-gradient(180deg, rgba(255, 255, 255, 0.06), transparent 60%), repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.04) 1px, transparent 1px, transparent 8px), linear-gradient(90deg, #6f4227, #58311c 24%, #6f4227);
-          border-radius: 24px;
-          padding: 18px;
+          border-radius: 22px;
+          padding: 10px 4px 4px;
+          transform-origin: top left;
         }
 
-        .hero-card p,
+        .nut-line {
+          position: absolute;
+          top: 0;
+          bottom: 0;
+          /* place between open (0) and first fret (1): label width + 1/13 of remaining fret area */
+          left: calc(var(--label-width) + (100% - var(--label-width)) / 13);
+          width: 6px; /* slightly thicker than regular fret borders */
+          background: rgba(255, 250, 240, 0.95); /* white-ivory tone */
+          z-index: 3;
+          pointer-events: none;
+        }
+
         .status-item span {
           color: #cbd5e1;
         }
 
-        h1 {
-          margin: 0.6rem 0 1rem;
-          font-size: clamp(2rem, 4vw, 3rem);
-          line-height: 1.05;
-        }
-
         .eyebrow {
-          text-transform: uppercase;
-          letter-spacing: 0.18em;
-          font-size: 0.78rem;
-          color: #7dd3fc;
-          margin-bottom: 0.75rem;
+          display: none;
         }
 
-        .status-card {
+        .status-row {
           display: grid;
-          grid-template-columns: repeat(3, minmax(0, 1fr));
-          gap: 12px;
-          margin-top: 20px;
+          grid-template-columns: repeat(4, minmax(0, 1fr));
+          gap: 4px;
+          align-items: stretch;
         }
 
         .status-item {
           background: rgba(148, 163, 184, 0.08);
-          border-radius: 16px;
-          padding: 16px;
+          border-radius: 14px;
+          padding: 1px 2px;
           text-align: center;
+          min-height: auto;
+          height: auto;
+          line-height: 1.1;
         }
 
         .string-selector {
           display: flex;
-          flex-wrap: wrap;
-          gap: 10px;
-          margin-top: 16px;
-          justify-content: center;
+          flex-wrap: nowrap;
+          gap: 3px;
+          justify-content: flex-start;
+          overflow: hidden;
+          min-width: 0;
         }
 
         .string-toggle {
           border: none;
           border-radius: 999px;
-          padding: 10px 14px;
+          padding: 4px 6px;
+          min-width: 24px;
+          font-size: 0.68rem;
           background: rgba(255, 255, 255, 0.08);
           color: #f8fafc;
           cursor: pointer;
@@ -676,27 +722,27 @@ export default function Home() {
 
         .volume-controls {
           display: flex;
-          flex-wrap: wrap;
           align-items: center;
-          gap: 12px;
-          margin-top: 14px;
+          gap: 3px;
           color: #cbd5e1;
+          justify-content: flex-end;
         }
 
         .volume-label {
-          font-size: 0.95rem;
+          font-size: 0.78rem;
           color: #e2e8f0;
         }
 
         .volume-buttons {
           display: flex;
-          gap: 8px;
+          gap: 5px;
         }
 
         .volume-step {
           border: 1px solid rgba(255, 255, 255, 0.12);
           border-radius: 999px;
-          padding: 8px 12px;
+          padding: 3px 5px;
+          font-size: 0.68rem;
           background: rgba(255, 255, 255, 0.06);
           color: #f8fafc;
           cursor: pointer;
@@ -715,31 +761,68 @@ export default function Home() {
 
         .status-item strong {
           display: block;
-          margin-top: 8px;
-          font-size: 1.45rem;
+          margin-top: 0;
+          font-size: 0.76rem;
           color: #e2e8f0;
+          line-height: 1.1;
         }
 
-        .accuracy {
-          margin-top: 6px;
-          font-size: 0.95rem;
+        .status-item span {
+          font-size: 0.7rem;
+          display: block;
+          line-height: 1.1;
+        }
+
+        .accuracy-small {
+          display: flex;
+          flex-direction: column;
+          align-items: flex-end;
+          justify-content: center;
+          font-size: 0.64rem;
           color: #cbd5e1;
-          letter-spacing: 0.02em;
+          min-width: 0;
+          gap: 1px;
+        }
+
+        .accuracy-small strong {
+          font-size: 0.8rem;
+          color: #e2e8f0;
+          line-height: 1.1;
+        }
+
+        .control-row {
+          display: grid;
+          grid-template-columns: minmax(0, 1fr) auto auto auto;
+          align-items: center;
+          gap: 3px;
+          min-height: 28px;
+        }
+
+        .control-row > * {
+          min-width: 0;
+        }
+
+        .control-actions {
+          display: flex;
+          gap: 4px;
+          align-items: center;
+          justify-content: flex-end;
+          min-width: 0;
         }
 
         .button-row {
           display: flex;
-          gap: 12px;
-          flex-wrap: wrap;
-          margin-top: 20px;
+          gap: 1px;
+          align-items: center;
+          justify-content: center;
         }
 
         .primary-button,
         .secondary-button {
           border: none;
-          border-radius: 14px;
-          padding: 14px 20px;
-          font-size: 1rem;
+          border-radius: 10px;
+          padding: 4px 6px;
+          font-size: 0.64rem;
           cursor: pointer;
           transition: transform 0.16s ease, background-color 0.16s ease;
         }
@@ -765,10 +848,10 @@ export default function Home() {
         }
 
         .feedback-bar {
-          min-height: 1.5rem;
-          margin-top: 14px;
+          min-height: 1.25rem;
           color: #f8fafc;
           font-weight: 600;
+          font-size: 0.78rem;
         }
 
         .correct {
@@ -784,27 +867,29 @@ export default function Home() {
         }
 
         .fretboard-card {
-          overflow-x: auto;
+          overflow: hidden;
         }
 
         .fret-labels {
           display: grid;
-          grid-template-columns: 80px repeat(13, minmax(60px, 1fr));
+          grid-template-columns: 64px repeat(13, minmax(46px, 1fr));
           align-items: center;
           gap: 0;
-          padding-top: 16px;
+          min-height: 56px;
+          padding: 6px 0 6px;
           border-top: 1px solid rgba(255, 255, 255, 0.12);
-          margin-top: 16px;
+          margin-top: 4px;
         }
 
         .fret-number,
         .string-label {
           display: flex;
+          flex-direction: column;
           align-items: center;
-          justify-content: center;
+          justify-content: flex-start;
           position: relative;
-          padding: 14px 8px;
-          font-size: 0.95rem;
+          padding: 3px 2px 4px;
+          font-size: 0.72rem;
           color: #f8fafc;
         }
 
@@ -812,7 +897,7 @@ export default function Home() {
           display: flex;
           flex-direction: column;
           align-items: center;
-          gap: 4px;
+          gap: 2px;
           font-size: 0.88rem;
           line-height: 1.1;
           color: rgba(248, 250, 252, 0.9);
@@ -832,14 +917,12 @@ export default function Home() {
         }
 
         .position-mark {
-          position: absolute;
-          bottom: 6px;
-          left: 50%;
-          transform: translateX(-50%);
           display: flex;
-          gap: 6px;
+          gap: 3px;
           align-items: center;
           justify-content: center;
+          margin-top: 2px;
+          pointer-events: none;
         }
 
         .position-mark span {
@@ -850,13 +933,23 @@ export default function Home() {
           box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
         }
 
+        .position-mark.double {
+          flex-direction: row;
+          gap: 3px;
+        }
+
+        .position-mark span,
         .position-mark.double span {
-          width: 9px;
-          height: 9px;
+          width: 4px;
+          height: 4px;
+          border-radius: 999px;
+          background: rgba(248, 250, 252, 0.9);
+          box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
         }
 
         .fretboard {
           display: grid;
+          position: relative;
           gap: 8px;
         }
 
@@ -882,7 +975,7 @@ export default function Home() {
         .fret-cell {
           border-left: 1px solid rgba(255, 255, 255, 0.12);
           background: transparent;
-          min-height: 62px;
+          min-height: 38px;
           border-radius: 0;
           position: relative;
           overflow: hidden;
@@ -904,8 +997,8 @@ export default function Home() {
         }
 
         .fret-point {
-          width: 18px;
-          height: 18px;
+          width: 14px;
+          height: 14px;
           border-radius: 999px;
           background: rgba(255, 255, 255, 0.12);
           border: 1px solid rgba(255, 255, 255, 0.2);
@@ -913,15 +1006,15 @@ export default function Home() {
           align-items: center;
           justify-content: center;
           color: transparent;
-          font-size: 0.8rem;
+          font-size: 0.68rem;
           font-weight: 700;
           transition: transform 0.16s ease, background-color 0.16s ease, border-color 0.16s ease, box-shadow 0.16s ease, color 0.16s ease;
           z-index: 2;
         }
 
         .fret-point.revealed {
-          width: 40px;
-          height: 40px;
+          width: 34px;
+          height: 34px;
           background: rgba(255, 255, 255, 0.14);
           border-color: rgba(56, 189, 248, 0.55);
           color: #f8fafc;
@@ -953,47 +1046,395 @@ export default function Home() {
           color: inherit;
         }
 
-        @media (max-width: 900px) {
-          .status-card {
-            grid-template-columns: repeat(2, minmax(0, 1fr));
+        @media (max-width: 950px) {
+          .status-row {
+            grid-template-columns: repeat(4, minmax(0, 1fr));
           }
 
-          .fretboard-card,
-          .hero-card {
-            padding: 18px;
+          .status-row,
+          .control-row,
+          .fretboard-card {
+            padding: 5px 6px;
+          }
+
+          .fretboard-shell {
+            padding: 6px;
+          }
+
+          .status-item {
+            padding: 4px 5px;
+          }
+
+          .status-item strong {
+            font-size: 0.9rem;
+          }
+
+          .status-item span {
+            font-size: 0.66rem;
+          }
+
+          .button-row {
+            gap: 4px;
+          }
+
+          .primary-button,
+          .secondary-button {
+            padding: 5px 8px;
+            font-size: 0.7rem;
+          }
+
+          .volume-label {
+            font-size: 0.72rem;
+          }
+
+          .volume-step {
+            padding: 3px 5px;
+            font-size: 0.68rem;
           }
 
           .fret-labels,
           .string-row {
-            grid-template-columns: 60px repeat(13, minmax(44px, 1fr));
+            grid-template-columns: 48px repeat(13, minmax(30px, 1fr));
+          }
+          .fretboard-shell {
+            --label-width: 48px;
           }
 
           .fret-cell {
-            min-height: 44px;
+            min-height: 40px;
+          }
+
+          .fret-point {
+            width: 15px;
+            height: 15px;
+          }
+
+          .fret-point.revealed {
+            width: 32px;
+            height: 32px;
+          }
+
+          .note-label {
+            font-size: 0.72rem;
           }
         }
 
         @media (max-width: 640px) {
           .page-shell {
-            padding: 16px 12px;
+            padding: 10px 6px;
+          }
+
+          .content {
+            gap: 10px;
           }
 
           .button-row {
-            flex-direction: column;
+            flex-wrap: wrap;
           }
 
-          .status-card {
-            grid-template-columns: 1fr;
+          .status-row {
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+          }
+
+          .status-row,
+          .control-row,
+          .fretboard-card {
+            padding: 6px;
+          }
+
+          .fretboard-shell {
+            padding: 6px;
+            transform: scale(0.86);
+          }
+
+          .string-toggle {
+            padding: 6px 10px;
+            font-size: 0.86rem;
+          }
+
+          .volume-step {
+            padding: 5px 7px;
           }
 
           .fret-labels,
           .string-row {
-            grid-template-columns: 52px repeat(13, minmax(36px, 1fr));
+            grid-template-columns: 48px repeat(13, minmax(28px, 1fr));
+          }
+          .fretboard-shell {
+            --label-width: 48px;
+          }
+
+          .fret-cell {
+            min-height: 38px;
+          }
+
+          .fret-point {
+            width: 16px;
+            height: 16px;
+          }
+
+          .fret-point.revealed {
+            width: 34px;
+            height: 34px;
+          }
+
+          .position-mark span {
+            width: 8px;
+            height: 8px;
           }
 
           .note-label {
-            font-size: 0.8rem;
+            font-size: 0.72rem;
           }
+        }
+
+        @media (max-width: 950px) and (orientation: landscape) {
+          .status-row {
+            padding: 6px 5px;
+          }
+
+          .control-row {
+            padding: 6px 5px;
+            min-height: 46px;
+          }
+
+          .status-item {
+            padding: 4px 4px;
+          }
+
+          .status-item strong {
+            font-size: 0.84rem;
+            margin-top: 1px;
+          }
+
+          .status-item span {
+            font-size: 0.62rem;
+          }
+
+          .accuracy {
+            font-size: 0.7rem;
+          }
+
+          .button-row {
+            gap: 3px;
+          }
+
+          .primary-button,
+          .secondary-button {
+            padding: 5px 7px;
+            font-size: 0.66rem;
+          }
+
+          .volume-controls {
+            gap: 4px;
+          }
+
+          .volume-label {
+            font-size: 0.68rem;
+          }
+
+          .volume-step {
+            padding: 3px 4px;
+            font-size: 0.66rem;
+          }
+
+          .fretboard-shell {
+            transform: scale(0.8);
+            transform-origin: top left;
+            width: 100%;
+            min-height: 220px;
+            padding: 10px 4px 4px;
+          }
+
+          .fret-labels,
+          .string-row {
+            grid-template-columns: 40px repeat(13, minmax(22px, 1fr));
+          }
+          .fretboard-shell {
+            --label-width: 40px;
+          }
+
+          .fret-cell {
+            min-height: 36px;
+          }
+
+          .fret-point {
+            width: 12px;
+            height: 12px;
+          }
+
+          .fret-point.revealed {
+            width: 28px;
+            height: 28px;
+          }
+
+          .note-label {
+            font-size: 0.62rem;
+          }
+
+          .string-selector {
+            justify-content: flex-start;
+            gap: 4px;
+          }
+          :global(html), :global(body) {
+            overflow-x: hidden;
+          }
+
+          .page-shell,
+          .content,
+          .status-row,
+          .control-row,
+          .fretboard-card,
+          .fretboard-shell,
+          main {
+            overflow-x: hidden;
+          }
+
+          .page-shell {
+            padding: 10px 6px;
+          }
+
+          .status-row {
+            padding: 6px 4px;
+          }
+
+          .control-row {
+            padding: 6px 4px;
+          }
+
+          .status-row {
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 5px;
+          }
+
+          .status-item {
+            padding: 5px 4px;
+          }
+
+          .status-item strong {
+            font-size: 0.9rem;
+            margin-top: 2px;
+          }
+
+          .status-item span {
+            font-size: 0.64rem;
+          }
+
+          .accuracy {
+            font-size: 0.72rem;
+          }
+
+          .button-row {
+            flex-wrap: nowrap;
+            justify-content: space-between;
+            gap: 4px;
+          }
+
+          .primary-button,
+          .secondary-button {
+            padding: 6px 7px;
+            font-size: 0.7rem;
+          }
+
+          .button-row {
+            width: 100%;
+          }
+
+          .volume-controls {
+            gap: 6px;
+            width: 100%;
+            justify-content: space-between;
+          }
+
+          .volume-label {
+            font-size: 0.72rem;
+          }
+
+          .volume-buttons {
+            flex-wrap: wrap;
+            gap: 4px;
+          }
+
+          .volume-step {
+            padding: 4px 6px;
+            font-size: 0.72rem;
+          }
+
+          .fretboard-shell {
+            transform: scale(0.84);
+            transform-origin: top left;
+            width: 100%;
+            min-height: 240px;
+            padding: 10px 4px 4px;
+          }
+
+          .fret-labels,
+          .string-row {
+            grid-template-columns: 42px repeat(13, minmax(24px, 1fr));
+          }
+          .fretboard-shell {
+            --label-width: 42px;
+          }
+
+          .fret-cell {
+            min-height: 34px;
+          }
+
+          .fret-point {
+            width: 14px;
+            height: 14px;
+          }
+
+          .fret-point.revealed {
+            width: 30px;
+            height: 30px;
+          }
+
+          .note-label {
+            font-size: 0.66rem;
+          }
+
+          .string-selector {
+            justify-content: flex-start;
+            gap: 6px;
+          }
+        }
+
+        @media (orientation: portrait) {
+          .content {
+            display: none;
+          }
+
+          .portrait-warning {
+            display: flex;
+          }
+
+          .page-shell,
+          main,
+          .status-row,
+          .control-row,
+          .fretboard-card {
+            overflow-x: hidden;
+          }
+        }
+
+        .portrait-warning {
+          display: none;
+          position: fixed;
+          inset: 0;
+          z-index: 999;
+          background: rgba(15, 23, 42, 0.96);
+          color: #f8fafc;
+          align-items: center;
+          justify-content: center;
+          padding: 24px;
+          text-align: center;
+        }
+
+        .portrait-warning p {
+          margin: 0;
+          line-height: 1.5;
+          font-size: 1.05rem;
         }
       `}</style>
     </div>
